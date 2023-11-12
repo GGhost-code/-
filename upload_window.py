@@ -33,21 +33,39 @@ class UploadWindow(QMainWindow):
             QMessageBox.critical(self, 'Ошибка', "Не указано название предмета")
             return
         if not number.isdigit() or len(number) != 11 or (number[0] != "7" and number[0] != "8"):
-            QMessageBox.critical(self, 'Ошибка', "Неправильно набран номер телефона")
+            if not number.isdigit():
+                QMessageBox.critical(self, 'Ошибка', "В номере обнаружена буква или специальный символ")
+            elif len(number) != 11:
+                QMessageBox.critical(self, 'Ошибка', "Номер телефона либо слишком короткий, либо слишком длинный")
+            else:
+                QMessageBox.critical(self, 'Ошибка', "Номер начинается с неправильного индекса страна")
             return
         if not filename:
             QMessageBox.critical(self, 'Ошибка', "Не выбран файл с фото")
             return
-        id = uuid0.generate()
-        self.save_image(filename, id)
+        if number[0] == "8":
+            number = "7" + number[1:]
+        photo_id = uuid0.generate()
+        self.save_image(filename, photo_id)
         category_id = self.cur.execute(
             f'SELECT Id FROM categories WHERE name = "{category}"').fetchall()[0][0]
-        query = f'INSERT INTO things (name, category_id, phone, filename_id) VALUES ("{name}", {category_id},' \
-                f' "{number}", "{id}")'
+        check = f'SELECT * FROM things WHERE name == "{name}" AND category_id == {category_id} AND phone == "{number}"'
+        res = self.cur.execute(check).fetchall()
+        type = 1
+        if res:
+            query = f'UPDATE things SET filename_id="{photo_id}" WHERE name == "{name}" AND category_id' \
+                    f' == {category_id} AND phone == "{number}"'
+            type = 0
+        else:
+            query = f'INSERT INTO things (name, category_id, phone, filename_id) VALUES ("{name}", {category_id},' \
+                f' "{number}", "{photo_id}")'
         self.cur.execute(query)
         self.db.commit()
         self.reset()
-        QMessageBox.information(self, "Поздравляю", "Ваше объявление успешно подано!")
+        if type:
+            QMessageBox.information(self, "Поздравляю", "Ваше объявление успешно подано!")
+        else:
+            QMessageBox.information(self, "Поздравляю", "Ваше объявление успешно изменено!")
 
     def update_filename(self): # Установить новое имя файла в соответствующей строке
         self.uploadName.setText(self.filename)

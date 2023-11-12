@@ -20,16 +20,11 @@ class SearchWindow(QMainWindow):
     def initUi(self):
         self.searchBtn.clicked.connect(self.search)
         self.resetBtn.clicked.connect(self.reset)
-        self.resComp.clicked.connect(self.out)
         self.photo_window = PhotoWindow()
-
-    def out(self): # Вывод результата запроса в файл
-        pass
 
     def open_photo(self, filename, id): # Открыть фото для просмотра
         def result():
             self.photo_window.initUi(filename, id)
-            print(filename)
             self.photo_window.show()
 
         return result
@@ -55,12 +50,8 @@ class SearchWindow(QMainWindow):
             if category:
                 query += f' category_id == {self.getCategoryId(category)}'
 
-        print(query)
 
         result = self.cur.execute(query).fetchall()
-
-        for i in result:
-            print(i)
 
         self.table.setRowCount(len(result))
         for i, row in enumerate(result):
@@ -95,10 +86,7 @@ class SearchWindow(QMainWindow):
             return "Другое"
 
     def make_number_correct(self, number): # Сделать номер телефона корректным
-        if number[0] == "8":
-            number = "+7" + number[1:]
-        else:
-            number = "+" + number
+        number = "+" + number
         number = number[:2] + " " + number[2:]
         number = number[:6] + " " + number[6:]
         number = number[:10] + "-" + number[10:]
