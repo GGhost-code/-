@@ -24,7 +24,7 @@ class StartWindow(QMainWindow):
         self.saveref = QAction("Сохранить справку", self)
         self.saveref.triggered.connect(self.getFolderName)
         self.reference.addAction(self.saveref)
-
+        self.createImageFolder()
         self.ref_text = '''
             Проект “Потеряшка”
             Выполнял ученик 9 О класса
@@ -88,6 +88,10 @@ class StartWindow(QMainWindow):
             f.close()
         except:
             QMessageBox.critical(self, 'Ошибка', "Не выбрана папка")
+
+    def createImageFolder(self):
+        if not os.path.exists('images'):
+            os.mkdir('images')
 
 
     def open_ref(self):
