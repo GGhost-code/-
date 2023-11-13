@@ -81,21 +81,21 @@ class UploadWindow(QMainWindow):
         self.update_filename()
 
     def save_image(self, filename, id): # Сохранить изображение
-        im = Image.open(filename)
-        im2 = None
-        x, y = im.size
-        nx, ny = 700, 450
-        nratio = nx / ny
-        ratio = x / y
-        if ratio > nratio:
-            xratio = nx / x
-            height = int(xratio * y)
-            im2 = im.resize((nx, height))
-        elif ratio < nratio:
-            yratio = ny / y
-            width = int(yratio * x)
-            im2 = im.resize((width, ny))
-        im2.save(f'images/{id}.png')
+        image = Image.open(filename)
+        to_save = None
+        x, y = image.size
+        x1, x2 = 700, 450
+        size1 = x / y
+        size2 = x1 / x2
+        if size1 > size2:
+            sizex = x1 / x
+            height = int(sizex * y)
+            to_save = image.resize((x1, height))
+        elif size1 < size2:
+            sizex = x2 / y
+            width = int(sizex * x)
+            to_save = image.resize((width, x2))
+        to_save.save(f'images/{id}.png')
 
     def reset(self): # Сбросить всё
         self.uploadName.setText("")
